@@ -1,0 +1,112 @@
+---
+title: "From pamDP to DwC"
+author: "Marius Bottin"
+format: gfm
+editor: visual
+---
+
+This document is to show quickly how to analyse the structure and variables of pamDP data formats and to transform it to the DarwinCore format (event + Audiovisual Media Description + registers).
+Of course, it would be better to make a python code that could be integrated with the codes the soundscape team develop in the institute, but the objective here is only to show a proof of concept.
+
+# Reading data
+I put the data in the a directory `data_transformacion` at level -1 of this repository.
+
+First, we read the mapping xlsx file:
+
+```{r}
+require(openxlsx)
+wb<-loadWorkbook("../data_transformacion/Sistematización de datos - pamDP.xlsx")
+mapping<-lapply(names(wb),function(x)read.xlsx(xlsxFile=wb,sheet=x))
+names(mapping)<-names(wb)
+```
+
+The structure of the mapping file is somewhat dirty, if we want to automatize more the process in the future, we will need to clean that:
+
+```{r}
+lapply(mapping,colnames)
+```
+
+
+Now we read the csv files containing the data:
+
+```{r}
+csvFiles<-c(media="../data_transformacion/media.csv",deployments="../data_transformacion/deployments.csv",observations="../data_transformacion/observations.csv")
+data<-lapply(csvFiles,read.csv)
+```
+
+# Checking on variables
+
+The name of the fields are not very clean neither:
+
+```{r}
+mapping$media.csv$pamDP.Field.Name
+mapping$deployments.csv$`pamDP.-.Field.Name`
+mapping$observation.csv$`pamDP.-.Field.Name`
+```
+
+We will need to trim the names of the fields (to suppress the ' *') at the end of the character strings:
+
+```{r}
+(mapping$media.csv$pamDP_field<-gsub(" \\*$","",mapping$media.csv$pamDP.Field.Name))
+(mapping$deployments.csv$pamDP_field<-gsub(" \\*$","",mapping$deployments.csv$`pamDP.-.Field.Name`))
+(mapping$observation.csv$pamDP_field<-gsub(" \\*$","",mapping$observation.csv$`pamDP.-.Field.Name`))
+```
+
+Now we can check which fields from the mappings are present in data files
+
+```{r}
+(m_media<-match(colnames(data$media),mapping$media.csv$pamDP_field))
+(m_deployments<-match(colnames(data$deployments),mapping$deployments.csv$pamDP_field))
+(m_observations<-match(colnames(data$observations),mapping$observation.csv$pamDP_field))
+
+```
+
+We put in the mapping whether the variables are in the data or not:
+
+```{r}
+mapping$media.csv$presentInData<-F
+mapping$media.csv$presentInData[m_media]<-T
+mapping$deployments.csv$presentInData<-F
+mapping$deployments.csv$presentInData[m_deployments]<-T
+mapping$observation.csv$presentInData<-F
+mapping$observation.csv$presentInData[m_observations]<-T
+```
+
+Let's consider that the required variables for DwC are the ones marked as required for pamDP + the ones not having any equivalent in pamDP, that were added in the mapping. 
+In the future, we should have a system to map from DwC to all the variables allowing to create the DwC variables, and to document whether the variable is required in the DwC.
+
+```{r}
+mapping$media.csv$DwC_required<-ifelse(is.na(mapping$media.csv$Required),T,mapping$media.csv$Required)
+mapping$deployments.csv$DwC_required<-ifelse(is.na(mapping$deployments.csv$Required),T,mapping$deployments.csv$Required)
+mapping$observation.csv$DwC_required<-ifelse(is.na(mapping$observation.csv$Required),T,mapping$observation.csv$Required)
+```
+
+Tables present vs required:
+
+```{r}
+table(mapping$media.csv[c("DwC_required","presentInData")])
+table(mapping$deployments.csv[c("DwC_required","presentInData")])
+table(mapping$observation.csv[c("DwC_required","presentInData")])
+```
+
+## Missing variables
+
+Media.csv:
+
+```{r}
+mapping$media.csv[!mapping$media.csv$presentInData&mapping$media.csv$DwC_required,c("pamDP.Field.Name","DarwinCore")]
+```
+
+Deployments.csv
+
+```{r}
+mapping$deployments.csv[!mapping$deployments.csv$presentInData&mapping$deployments.csv$DwC_required,c("pamDP.-.Field.Name","DarwinCore")]
+```
+
+Observation.csv
+
+```{r}
+mapping$observation.csv[!mapping$observation.csv$presentInData&mapping$observation.csv$DwC_required,c("pamDP.-.Field.Name","DarwinCore")]
+```
+
+
