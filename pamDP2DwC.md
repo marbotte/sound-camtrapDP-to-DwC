@@ -260,9 +260,10 @@ Media.csv:
 mapping$media.csv[!mapping$media.csv$presentInData&mapping$media.csv$DwC_required,c("pamDP.Field.Name","DarwinCore")]
 ```
 
-       pamDP.Field.Name    DarwinCore
-    6      filePublic *     available
-    15             <NA> captureDevice
+|     | pamDP.Field.Name | DarwinCore    |
+|:----|:-----------------|:--------------|
+| 6   | filePublic \*    | available     |
+| 15  | NA               | captureDevice |
 
 Deployments.csv
 
@@ -270,14 +271,15 @@ Deployments.csv
 mapping$deployments.csv[!mapping$deployments.csv$presentInData&mapping$deployments.csv$DwC_required,c("pamDP.-.Field.Name","DarwinCore")]
 ```
 
-       pamDP.-.Field.Name      DarwinCore
-    26               <NA>       continent
-    27               <NA>         country
-    28               <NA>     countryCode
-    29               <NA>   stateProvince
-    30               <NA>          county
-    31               <NA>        locality
-    32               <NA> institutionCode
+|     | pamDP.-.Field.Name | DarwinCore      |
+|:----|:-------------------|:----------------|
+| 26  | NA                 | continent       |
+| 27  | NA                 | country         |
+| 28  | NA                 | countryCode     |
+| 29  | NA                 | stateProvince   |
+| 30  | NA                 | county          |
+| 31  | NA                 | locality        |
+| 32  | NA                 | institutionCode |
 
 Observation.csv
 
@@ -285,5 +287,6 @@ Observation.csv
 mapping$observation.csv[!mapping$observation.csv$presentInData&mapping$observation.csv$DwC_required,c("pamDP.-.Field.Name","DarwinCore")]
 ```
 
-      pamDP.-.Field.Name DarwinCore
-    5   observationLevel       <NA>
+|     | pamDP.-.Field.Name | DarwinCore |
+|:----|:-------------------|:-----------|
+| 5   | observationLevel   | NA         |

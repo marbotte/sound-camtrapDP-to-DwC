@@ -1,7 +1,9 @@
 ---
 title: "From pamDP to DwC"
 author: "Marius Bottin"
-format: gfm
+format: 
+  gfm:
+    df-print: kable
 editor: visual
 ---
 
@@ -77,8 +79,11 @@ In the future, we should have a system to map from DwC to all the variables allo
 
 ```{r}
 mapping$media.csv$DwC_required<-ifelse(is.na(mapping$media.csv$Required),T,mapping$media.csv$Required)
+mapping$media.csv$DwC_required[is.na(mapping$media.csv$DarwinCore)]<-F
 mapping$deployments.csv$DwC_required<-ifelse(is.na(mapping$deployments.csv$Required),T,mapping$deployments.csv$Required)
+mapping$deployments.csv$DwC_required[is.na(mapping$deployments.csv$DarwinCore)]<-F
 mapping$observation.csv$DwC_required<-ifelse(is.na(mapping$observation.csv$Required),T,mapping$observation.csv$Required)
+mapping$observation.csv$DwC_required[is.na(mapping$observation.csv$DarwinCore)]<-F
 ```
 
 Tables present vs required:
@@ -109,4 +114,4 @@ Observation.csv
 mapping$observation.csv[!mapping$observation.csv$presentInData&mapping$observation.csv$DwC_required,c("pamDP.-.Field.Name","DarwinCore")]
 ```
 
-
+Para ir más allá y hacer el trabajo de manera más fina, deberíamos
